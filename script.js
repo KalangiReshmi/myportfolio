@@ -72,46 +72,44 @@ hamburger?.addEventListener("click", () => {
   navLinks.classList.toggle("show");
 });
 
-// Contact Form Submission to Google Sheets
-const form = document.getElementById("contact-form");
-const responseMsg = document.getElementById("form-response");
+document.querySelectorAll(".nav-links a").forEach(link =>
+    link.addEventListener("click", () => {
+      navLinks.classList.remove("show");
+    })
+  );
 
-form?.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const formData = {
-    name: form.name.value,
-    email: form.email.value,
-    message: form.message.value,
-  };
-
-  try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbzwAARjfeBWLXOb4MJfhvTKNiR1_KPcaWtCRbGqwjYGLydKjVGagKBtfqD3hDIgtu4C/exec", {
-      method: "POST",
-      body: JSON.stringify(formData),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
-
-    if (response.ok) {
+  const form = document.getElementById("contact-form");
+  const responseMsg = document.getElementById("form-response");
+  
+  form?.addEventListener("submit", async function (e) {
+    e.preventDefault();
+  
+    const formData = {
+      name: form.name.value,
+      email: form.email.value,
+      message: form.message.value,
+    };
+  
+    try {
+      const response = await fetch(
+        "https://script.google.com/macros/s/AKfycbwfgLJrHADAhS1IHgYcL5HpA3D0Pc0IT5PlceQf9qzlWCwYlcQzDmBztKwPfeoIMAfe/exec",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(formData),
+        }
+      );
+  
+      if (response.ok) {
         form.reset();
-        responseMsg.querySelector(".checkmark").style.display = "inline";
-        responseMsg.querySelector(".response-text").textContent = " Message sent successfully!";
+        responseMsg.textContent = "Message sent successfully!";
         responseMsg.style.color = "green";
-      
-        setTimeout(() => {
-          responseMsg.style.opacity = 0;
-          setTimeout(() => {
-            responseMsg.querySelector(".checkmark").style.display = "none";
-            responseMsg.querySelector(".response-text").textContent = "";
-            responseMsg.style.opacity = 1;
-          }, 400); // matches CSS transition time
-        }, 4000); // visible for 4 seconds
-      }else {
-      throw new Error("Form submission failed");
+      } else {
+        throw new Error("Form submission failed");
+      }
+    } catch (error) {
+      responseMsg.textContent = "Something went wrong. Please try again.";
+      responseMsg.style.color = "red";
     }
-  } catch (error) {
-    responseMsg.textContent = "Something went wrong. Please try again.";
-    responseMsg.style.color = "red";
-  }
-});
+  });
+  
